@@ -37,4 +37,4 @@ export default function SignOutButton() {
       <span>{isSigningOut ? 'Signing out...' : 'Sign Out'}</span>
     </button>
   );
-}
+}   
