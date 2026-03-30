@@ -2,22 +2,23 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // 1. Create a basic response
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
-  // 2. Quick check: If there's no URL or Key, exit early to avoid the 500 crash
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return response;
-  }
+  try {
+    // 1. Check if ENV vars exist (This is the most common cause of 500s)
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
+    if (!supabaseUrl || !supabaseKey) {
+      console.error("MIDDLEWARE ERROR: Missing Supabase Environment Variables")
+      return response
+    }
+
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cookiesToSet) => {
@@ -28,22 +29,25 @@ export async function middleware(request: NextRequest) {
           )
         },
       },
+    })
+
+    // 2. Try to get the user
+    const { data: { user } } = await supabase.auth.getUser()
+
+    const path = request.nextUrl.pathname
+    const isDashboard = path.startsWith('/faculty') || path.startsWith('/security') || path.startsWith('/superadmin')
+
+    if (!user && isDashboard) {
+      return NextResponse.redirect(new URL('/login', request.url))
     }
-  )
 
-  // Use getUser() as it is the only secure way to check auth in Middleware
-  const { data: { user } } = await supabase.auth.getUser()
+    return response
 
-  const isDashboard = request.nextUrl.pathname.startsWith('/faculty') || 
-                      request.nextUrl.pathname.startsWith('/security') || 
-                      request.nextUrl.pathname.startsWith('/superadmin')
-
-  // Redirect logic
-  if (!user && isDashboard) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  } catch (e) {
+    // 3. If everything crashes, don't show a 500 page, just log it
+    console.error("MIDDLEWARE CRASHED:", e)
+    return response
   }
-
-  return response
 }
 
 export const config = {
