@@ -1,5 +1,6 @@
 # Calcipher: Project Albider
 
+Streamlining school safety with unique QR verification for parents, faculty, and security. #school-safety #qr-code #supabase #auth #security #management-system
 live app link: [Albider]{https://calcipher-albider.vercel.app}
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
@@ -9,13 +10,8 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -33,3 +29,6 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+
+# albider-calcipher
+Streamlining school safety with unique QR verification for parents, faculty, and security. #school-safety #qr-code #supabase #auth #security #management-system
